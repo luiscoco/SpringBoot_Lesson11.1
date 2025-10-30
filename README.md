@@ -1,91 +1,53 @@
-# SpringBoot_Lesson9.2
+# SpringBoot_Lesson11
 
 ## Propmt for the Code Agent (Codex, Gemini Code Assistant or Copilot)
 
-**Context**:
+**Context**
 
-I am learning to write integration tests for a Spring Boot REST API using Spring Boot 3.3 and Java 17.
-
-I want to test the controller layer and HTTP responses using MockMvc, while mocking the service layer.
-
-The project has Basic auth enabled: endpoint pattern /tasks/** requires role USER, and there is an in-memory user user with password password.
+I am working on a Spring Boot application (Spring Boot 3.3, Java 17) and want to add monitoring capabilities.
 
 **Task**:
 
-Generate a JUnit 5 integration test for a TaskController class.
-
-**Known code in the app**:
-
-Controller: com.example.demo.controller.TaskController
-
-GET /tasks/{id} returns a TaskDto
-
-GET /tasks supports optional completed query param
-
-POST /tasks accepts a Task and returns a TaskDto (201 Created)
-
-Service: com.example.demo.service.TaskService
-
-Methods include TaskDto getTaskById(long id)
-
-DTO: com.example.demo.dto.TaskDto (record: TaskDto(Long id, String description, boolean completed))
-
-Security: Basic auth required for /tasks/**; in-memory user user / password.
+Configure the project to use Spring Boot Actuator and expose basic endpoints.
 
 **Constraints**:
 
-Use @SpringBootTest to load the application context.
+- Use Maven or Gradle for dependency management.
 
-Use @AutoConfigureMockMvc to test the web layer without a real HTTP server.
+- The `health` and `info` endpoints must be exposed over the web.
 
-Mock TaskService with @MockBean.
+- The `metrics` endpoint should NOT be exposed over the web.
 
-Use MockMvc to perform the request.
-
-Include a Basic auth header for the request (user:password).
+- All actuator endpoints should be available under the path `/management` instead of the default `/actuator`.
 
 **Steps**:
 
-Create src/test/java/com/example/demo/controller/TaskControllerTest.java with package com.example.demo.controller.
+1.  Add the `spring-boot-starter-actuator` dependency to the build file.
 
-Annotate the test class with @SpringBootTest and @AutoConfigureMockMvc.
+2.  Modify the `application.properties` or `application.yml` file to:
 
-Inject MockMvc and declare @MockBean TaskService taskService.
-
-Stub taskService.getTaskById(1L) to return new TaskDto(1L, "Test Task", false).
-
-Perform a GET request to /tasks/1 with Basic auth for user:password.
-
-Assert HTTP status 200 (OK).
-
-Assert the response is JSON and matches the DTO: id = 1, description = "Test Task", completed = false (e.g., using jsonPath).
-
-Include commands to run only this test using Maven or Gradle.
-
-**Acceptance Criteria**:
-
-The test class is annotated with @SpringBootTest and @AutoConfigureMockMvc.
-
-TaskService is mocked with @MockBean.
-
-The test performs a request using MockMvc and includes Basic auth.
-
-The test verifies HTTP 200 OK.
-
-The test verifies the JSON response body fields.
-
-The test compiles and passes.
+    a. Change the base path for management endpoints to `/management`.
+    
+    b. Explicitly expose only the `health` and `info` endpoints.
+    
+3.  Provide the `curl` commands to verify the endpoints after running the application.
 
 **Deliverables**:
 
-Full code for TaskControllerTest.java.
+- The Maven/Gradle dependency XML/Groovy snippet.
 
-Commands to run the test.
+- The required lines for `application.properties`.
 
-**Run Only This Test**:
+- `curl` commands to test `http://localhost:8080/management/health` and `http://localhost:8080/management/info`.
 
-Maven: mvn test -Dtest=com.example.demo.controller.TaskControllerTest
+- `curl` command to verify that `http://localhost:8080/management/metrics` returns a 404 Not Found.
 
-Gradle (Windows): gradlew.bat test --tests "com.example.demo.controller.TaskControllerTest"
+**Acceptance Criteria for your AI-generated code**:
 
-Gradle (Unix/macOS): ./gradlew test --tests "com.example.demo.controller.TaskControllerTest"
+•	The application compiles and runs with the new dependency.
+
+•	Accessing /management/health returns a JSON response with "status": "UP".
+
+•	Accessing /management/info returns an empty JSON object {}.
+
+•	Accessing /management/metrics returns a 404 HTTP status.
